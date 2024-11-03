@@ -8,11 +8,25 @@ library(bslib)
 
 data<-read.csv("user_behavior_dataset.csv")
 
-str(data2)
+str(data)
 
 data2<-data|>
   mutate(User.Behavior.Class=as.factor(User.Behavior.Class))
  
+str(data2)
+
+numeric_vars <- c("App Usage" = "App.Usage.Time..min.day.",
+                  "Screen Time" = "Screen.On.Time..hours.day.",
+                  "Battery Drain" = "Battery.Drain..mAh.day.",
+                  "Number of Apps" = "Number.of.Apps.Installed",
+                  "Data Usage" = "Data.Usage..MB.day.",
+                  "Age" = "Age")
+
+cat_vars<-c("Gender"="Gender",
+            "Behavior Class"="User.Behavior.Class",
+            "Operating System"="Operating.System",
+            "Device Model"="Device.Model")
+  
 
 #One way and Two way contingency Table 
 table(data2$Gender)
@@ -78,6 +92,23 @@ bar_chart(data=data2,x=Device.Model,facet=Gender)
 ui <- page_sidebar(
   title="Choose a subset of the data:",
   sidebar=sidebar("Subset Data",
+                  selectInput(
+                    "cat1",
+                    label = "Categorical Variable",
+                    choices=cat_vars
+                    ,
+                    selected="Gender"
+                    
+                  ),
+                  selectInput(
+                    "cat2",
+                    label = "Categorical Variable",
+                    choices=cat_vars[-1]
+                    ,
+                    selected="Operating.System"
+                    
+                  ),
+              
   radioButtons("Gender",
                "Select Gender",
                choices  = c("All", 
