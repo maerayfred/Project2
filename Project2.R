@@ -15,17 +15,7 @@ data2<-data|>
  
 str(data2)
 
-numeric_vars <- c("App Usage" = "App.Usage.Time..min.day.",
-                  "Screen Time" = "Screen.On.Time..hours.day.",
-                  "Battery Drain" = "Battery.Drain..mAh.day.",
-                  "Number of Apps" = "Number.of.Apps.Installed",
-                  "Data Usage" = "Data.Usage..MB.day.",
-                  "Age" = "Age")
-
-cat_vars<-c("Gender"="Gender",
-            "Behavior Class"="User.Behavior.Class",
-            "Operating System"="Operating.System",
-            "Device Model"="Device.Model")
+source("helpers.R")
   
 
 #One way and Two way contingency Table 
@@ -90,7 +80,7 @@ bar_chart(data=data2,x=Device.Model,facet=Gender)
 
 
 ui <- page_sidebar(
-  title="Choose a subset of the data:",
+  title="Mobile Device Data Exploration",
   sidebar=sidebar("Subset Data",
                   selectInput(
                     "cat1",
@@ -108,28 +98,27 @@ ui <- page_sidebar(
                     selected="Operating.System"
                     
                   ),
+                  selectInput(
+                    "num1",
+                    label = "Numeric Variable",
+                    choices=numeric_vars
+                    ,
+                    selected="Age"
+                    
+                  ),
+                  selectInput(
+                    "num2",
+                    label = "Numeric Variable",
+                    choices=numeric_vars[-6]
+                    ,
+                    selected="Screen.On.Time..hours.day."
+                    
+                  ) ,
+                  actionButton("Submit","Submit")
               
-  radioButtons("Gender",
-               "Select Gender",
-               choices  = c("All", 
-                                "Female",
-                                "Male"
-                                
-               )
-  ),
-  radioButtons("OS",
-               "Select Operating System",
-               choices = c("All",
-                           "IOS",
-                           "Android")),
-  radioButtons("Numeric",
-               "Select Numeric Variable",
-               choices  = c("All", 
-                            "Female",
-                            "Male"
-                            
-               )
-  )
+
+  
+
 )
 )
 
