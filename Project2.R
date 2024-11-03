@@ -2,11 +2,13 @@ library(tidyverse)
 library(ggplot2)
 library(ggcharts)
 library(dplyr)
-#Access the data locally 
+library(shiny)
+library(bslib)
+#Access shiny#Access the data locally 
 
 data<-read.csv("user_behavior_dataset.csv")
 
-str(data)
+str(data2)
 
 data2<-data|>
   mutate(User.Behavior.Class=as.factor(User.Behavior.Class))
@@ -71,5 +73,41 @@ ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=U
 
 ggcharts_set_theme("theme_nightblue")
 bar_chart(data=data2,x=Device.Model,facet=Gender)
+
+
+ui <- page_sidebar(
+  title="Choose a subset of the data:",
+  sidebar=sidebar("Subset Data",
+  radioButtons("Gender",
+               "Select Gender",
+               choices  = c("All", 
+                                "Female",
+                                "Male"
+                                
+               )
+  ),
+  radioButtons("OS",
+               "Select Operating System",
+               choices = c("All",
+                           "IOS",
+                           "Android")),
+  radioButtons("Numeric",
+               "Select Numeric Variable",
+               choices  = c("All", 
+                            "Female",
+                            "Male"
+                            
+               )
+  )
+)
+)
+
+# Define server logic ----
+server <- function(input, output) {
+  
+}
+
+# Run the app ----
+shinyApp(ui = ui, server = server)
 
 
