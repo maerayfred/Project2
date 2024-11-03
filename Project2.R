@@ -1,5 +1,7 @@
 library(tidyverse)
 library(ggplot2)
+library(ggcharts)
+library(dplyr)
 #Access the data locally 
 
 data<-read.csv("user_behavior_dataset.csv")
@@ -40,6 +42,34 @@ data2|>
   group_by(Gender)|>
   summarize(mean_scrntime=mean(Screen.On.Time..hours.day.,na.rm=TRUE),sd_scrntime=sd(Screen.On.Time..hours.day.,na.rm=TRUE),med_scrntime=median(Screen.On.Time..hours.day.,na.rm=TRUE),iqr_scrntime=IQR(Screen.On.Time..hours.day.,na.rm=TRUE),min_scrntime=min(Screen.On.Time..hours.day.,na.rm=TRUE),Max_scrntime=max(Screen.On.Time..hours.day.,na.rm = TRUE))
 
+#Plot1
 
+ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=data2$Operating.System))+
+  geom_bar()+
+  labs(x="Gender")+
+  scale_fill_discrete("Operating_System")+
+  coord_flip()
+
+
+#Plot2
+
+ggplot(data=data2|>drop_na(Age,Gender),aes(x=Age))+
+  geom_density(alpha=0.05,color="black",aes(fill=Gender))+
+  scale_fill_manual(values=c("Female"="purple","Male"="green"))
+
+#Plot3
+
+ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=User.Behavior.Class))+
+  geom_point(shape=17,size=2)
+
+
+#Plot4
+
+
+
+#Plot5
+
+ggcharts_set_theme("theme_nightblue")
+bar_chart(data=data2,x=Device.Model,facet=Gender)
 
 
