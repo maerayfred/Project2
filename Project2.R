@@ -4,6 +4,7 @@ library(ggcharts)
 library(dplyr)
 library(shiny)
 library(bslib)
+library(DT)
 #Access shiny#Access the data locally 
 
 data<-read.csv("user_behavior_dataset.csv")
@@ -114,16 +115,39 @@ ui <- page_sidebar(
                     selected="Screen.On.Time..hours.day."
                     
                   ) ,
+
+                  checkboxInput(inputId = "show_data",
+                                label="Show Data Table",value=FALSE),
+                  
                   actionButton("Submit","Submit")
-              
+                  
+
 
   
 
-)
+),
+      mainPanel(
+        card(
+          card_header("About Tab"),
+          "This is where all the information is going to go about the data and the website where it will be found"
+        ),
+        card(
+          dataTableOutput(outputId = "mobiledata")
+        )
+      )
 )
 
 # Define server logic ----
 server <- function(input, output) {
+    output$mobiledata<-renderDataTable({
+      if(input$show_data){
+        DT::datatable(data=data2 %>% select(1:9),
+                      options=list(pageLenth=10),
+                      rownames=FALSE)
+      }
+    }
+      
+    )
   
 }
 
