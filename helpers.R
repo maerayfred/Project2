@@ -1,3 +1,14 @@
+library(tidyverse)
+library(ggplot2)
+library(ggcharts)
+library(dplyr)
+library(shiny)
+library(bslib)
+library(DT)
+
+
+
+
 numeric_vars <- c("App Usage" = "App.Usage.Time..min.day.",
                   "Screen Time" = "Screen.On.Time..hours.day.",
                   "Battery Drain" = "Battery.Drain..mAh.day.",

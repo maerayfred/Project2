@@ -1,10 +1,4 @@
-library(tidyverse)
-library(ggplot2)
-library(ggcharts)
-library(dplyr)
-library(shiny)
-library(bslib)
-library(DT)
+source("helpers.R")
 #Access shiny#Access the data locally 
 
 data<-read.csv("user_behavior_dataset.csv")
@@ -16,7 +10,7 @@ data2<-data|>
  
 str(data2)
 
-source("helpers.R")
+
   
 
 #One way and Two way contingency Table 
@@ -86,7 +80,7 @@ ui <- page_sidebar(
                   selectInput(
                     "cat1",
                     label = "Categorical Variable",
-                    choices=c(cat_vars,"All"=cat_vars2)
+                    choices=cat_vars
                     ,
                     selected="Gender"
                     
@@ -94,11 +88,12 @@ ui <- page_sidebar(
                   selectInput(
                     "cat2",
                     label = "Categorical Variable",
-                    choices=cat_vars[-1]
+                    choices=cat_vars
                     ,
                     selected="Operating.System"
                     
                   ),
+
                   selectInput(
                     "num1",
                     label = "Numeric Variable",
