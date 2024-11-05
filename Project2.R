@@ -7,11 +7,11 @@ str(data)
 
 data2<-data|>
   mutate(User.Behavior.Class=as.factor(User.Behavior.Class))
- 
+
 str(data2)
 
 
-  
+
 
 #One way and Two way contingency Table 
 table(data2$Gender)
@@ -29,7 +29,7 @@ data2|>
   drop_na(Gender,User.Behavior.Class)|>
   group_by(Gender,User.Behavior.Class)|>
   summarize(count=n())|>
-pivot_wider(names_from = Gender,values_from = count)
+  pivot_wider(names_from = Gender,values_from = count)
 
 data2|>
   group_by(Gender)|>
@@ -81,17 +81,19 @@ ui <- page_sidebar(
                     "cat1",
                     label = "Categorical Variable",
                     choices=cat_vars
-
+                    
                     
                   ),
                   selectInput(
                     "cat2",
                     label = "Categorical Variable",
                     choices=cat_vars
-
+                    
                     
                   ),
-
+                  uiOutput("cat1levels"),
+                  uiOutput("cat2levels"),
+                  
                   selectInput(
                     "num1",
                     label = "Numeric Variable",
@@ -108,55 +110,76 @@ ui <- page_sidebar(
                     selected="Screen.On.Time..hours.day."
                     
                   ) ,
-
-
                   
                   actionButton("show_data","Show Data Table",value=FALSE)
                   
-
-
-  
-
-),
-      mainPanel(
-        card(
-          card_header("About Tab"),
-          "This is where all the information is going to go about the data and the website where it will be found"
-        ),
-        card(
-          card_header("Data Download"),
-          dataTableOutput(outputId = "mobiledata")
-        ),
-        card(
-          card_header("Bar Chart"),
-          plotOutput(outputId = "barchart")
-        )
-      )
+                  
+                  
+                  
+                  
+  ),
+  mainPanel(
+    card(
+      card_header("About Tab"),
+      "This is where all the information is going to go about the data and the website where it will be found"
+    ),
+    card(
+      card_header("Data Download"),
+      dataTableOutput(outputId = "mobiledata")
+    ),
+    card(
+      card_header("Bar Chart"),
+      plotOutput(outputId = "barchart")
+    )
+  )
 )
 
 # Define server logic ----
 server <- function(input, output,session) {
   
-
+  output$cat1levels <- renderUI({
+    req(input$cat1)  
+    selectInput("cat1levels", "Please Choose a Filter for First Categorical Variable", 
+                choices = unique(data[[input$cat1]]), 
+                selected = unique(data[[input$cat1]]), 
+                multiple = FALSE)
+  })
   
-    output$mobiledata<-renderDataTable({
-      if(input$show_data){
-        DT::datatable(data=data2 %>% select(input$cat1,input$cat2,input$num1,input$num2) 
+  output$cat2levels <- renderUI({
+    req(input$cat2)  
+    selectInput("cat2levels", "Please Choose a Filter for Second Categorical Variable", 
+                choices = unique(data[[input$cat2]]), 
+                selected = unique(data[[input$cat2]]), 
+                multiple = FALSE)
+  })
+  
+  filteredData <- reactive({
+    data2 %>%
+      select(input$cat1,input$cat2,input$num1,input$num2) %>%
+      filter(
+        !!sym(input$cat1) %in% input$cat1levels,   
+        !!sym(input$cat2) %in% input$cat2levels,    
+      )
+  })
+  
+  output$mobiledata<-renderDataTable({
+    if(input$show_data){
+      DT::datatable(data=filteredData()
                     ,
-                      options=list(pageLenth=15),
-                      rownames=FALSE)
-      }
+                    options=list(pageLenth=15),
+                    rownames=FALSE)
     }
-      
-    )
-    
-    output$barchart<-renderPlot({
-      ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=data2$Operating.System))+
-        geom_bar()+
-        labs(x="Gender")+
-        scale_fill_discrete("Operating_System")+
-        coord_flip()
-    })
+  }
+  
+  )
+  
+  output$barchart<-renderPlot({
+    ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=data2$Operating.System))+
+      geom_bar()+
+      labs(x="Gender")+
+      scale_fill_discrete("Operating_System")+
+      coord_flip()
+  })
   
 }
 

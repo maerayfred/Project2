@@ -25,15 +25,3 @@ cat_vars2<-cat_vars
 
 
 
-observeEvent(c(input$cat1, input$cat2), {
-  cat1 <- input$cat1
-  cat2<- input$cat2
-  choices <- numeric_vars
-  if (cat1 == cat2){
-    choices <- choices[-which(choices == cat1)]
-    updateSelectizeInput(session,
-                         "cat2",
-                         choices = choices)
-  }
-}
-)
