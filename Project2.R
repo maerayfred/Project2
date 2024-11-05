@@ -81,16 +81,14 @@ ui <- page_sidebar(
                     "cat1",
                     label = "Categorical Variable",
                     choices=cat_vars
-                    ,
-                    selected="Gender"
+
                     
                   ),
                   selectInput(
                     "cat2",
                     label = "Categorical Variable",
                     choices=cat_vars
-                    ,
-                    selected="Operating.System"
+
                     
                   ),
 
@@ -111,10 +109,9 @@ ui <- page_sidebar(
                     
                   ) ,
 
-                  checkboxInput(inputId = "show_data",
-                                label="Show Data Table",value=FALSE),
+
                   
-                  actionButton("Submit","Submit")
+                  actionButton("show_data","Show Data Table",value=FALSE)
                   
 
 
@@ -129,39 +126,41 @@ ui <- page_sidebar(
         card(
           card_header("Data Download"),
           dataTableOutput(outputId = "mobiledata")
+        ),
+        card(
+          card_header("Bar Chart"),
+          plotOutput(outputId = "barchart")
         )
       )
 )
 
 # Define server logic ----
-server <- function(input, output) {
+server <- function(input, output,session) {
   
-  observeEvent(c(input$cat1, input$cat2), {
-    cat1 <- input$cat1
-    cat2<- input$cat2
-    choices <- numeric_vars
-    if (cat1 == cat2){
-      choices <- choices[-which(choices == cat1)]
-      updateSelectizeInput(session,
-                           "cat2",
-                           choices = choices)
-    }
-  }
-  )
+
   
     output$mobiledata<-renderDataTable({
       if(input$show_data){
-        DT::datatable(data=data2 %>% select(input$cat1,input$cat2,input$num1,input$num2),
-                      options=list(pageLenth=10),
+        DT::datatable(data=data2 %>% select(input$cat1,input$cat2,input$num1,input$num2) 
+                    ,
+                      options=list(pageLenth=15),
                       rownames=FALSE)
       }
     }
       
     )
+    
+    output$barchart<-renderPlot({
+      ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=data2$Operating.System))+
+        geom_bar()+
+        labs(x="Gender")+
+        scale_fill_discrete("Operating_System")+
+        coord_flip()
+    })
   
 }
 
 # Run the app ----
-shinyApp(ui = ui, server = server)
+shinyApp(ui= ui, server= server)
 
 
