@@ -111,6 +111,9 @@ ui <- page_sidebar(
                     
                   ) ,
                   
+                  uiOutput("num1range"),
+                  uiOutput("num2range"),
+                  
                   
                   actionButton("show_data","Show Data Table",value=FALSE)
                   
@@ -167,6 +170,15 @@ server <- function(input, output,session) {
                 choices = unique(data[[input$cat2]]), 
                 selected = unique(data[[input$cat2]]), 
                 multiple = FALSE)
+  })
+  
+  output$num1range <- renderUI({
+    req(input$num1)  
+    rangeval <- range(data2[[input$num1]], na.rm = TRUE)
+    sliderInput("num1range", 
+                label = paste("Select range for", input$numvar1),
+                min = rangeval[1], max = rangeval[2], 
+                value = rangeval)
   })
   
   filteredData <- reactive({
