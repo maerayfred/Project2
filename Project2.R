@@ -45,7 +45,7 @@ data2|>
 
 #Plot1
 
-ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=data2$Operating.System))+
+ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=Operating.System))+
   geom_bar()+
   labs(x="Gender")+
   scale_fill_discrete("Operating_System")+
@@ -111,6 +111,7 @@ ui <- page_sidebar(
                     
                   ) ,
                   
+                  
                   actionButton("show_data","Show Data Table",value=FALSE)
                   
                   
@@ -128,10 +129,25 @@ ui <- page_sidebar(
       dataTableOutput(outputId = "mobiledata")
     ),
     card(
-      card_header("Bar Chart"),
-      plotOutput(outputId = "barchart")
+      card_header("Categorical Variables to Summarize"),
+      selectInput(
+        "cat11",
+        label = "Categorical Variable",
+        choices=cat_vars[-1])),
+      card(
+        card_header("Bar Chart"),
+        plotOutput(outputId = "barchart") , 
+        plotOutput(outputId = "twobar")
+    ),
+    card(
+      card_header("Numerical Variable to Summarize"),
+      plotOutput(outputId = "scatterplot"),
+      plotOutput(outputId = "density")
     )
-  )
+      )
+   
+    
+  
 )
 
 # Define server logic ----
@@ -158,7 +174,8 @@ server <- function(input, output,session) {
       select(input$cat1,input$cat2,input$num1,input$num2) %>%
       filter(
         !!sym(input$cat1) %in% input$cat1levels,   
-        !!sym(input$cat2) %in% input$cat2levels,    
+        !!sym(input$cat2) %in% input$cat2levels,   
+
       )
   })
   
@@ -173,13 +190,41 @@ server <- function(input, output,session) {
   
   )
   
+  filteredData2 <- reactive({
+    data2 %>%
+      select(Gender,input$cat11) %>%
+      drop_na(Gender,input$cat11)
+     
+  })
+
+ 
+  
   output$barchart<-renderPlot({
-    ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=data2$Operating.System))+
+    ggplot(data=data2, aes(x=Gender, fill=Operating.System))+
       geom_bar()+
       labs(x="Gender")+
-      scale_fill_discrete("Operating_System")+
+      scale_fill_discrete()+
       coord_flip()
   })
+  
+  output$scatterplot<-renderPlot({
+    ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=User.Behavior.Class))+
+      geom_point(shape=17,size=2)
+  })
+  
+  output$twobar<-renderPlot({
+  ggcharts_set_theme("theme_nightblue")
+  bar_chart(data=data2,x=Device.Model,facet=Gender)
+  })
+  
+  output$density<-renderPlot({
+    ggplot(data=data2|>drop_na(Age,Gender),aes(x=Age))+
+      geom_density(alpha=0.05,color="black",aes(fill=Gender))+
+      scale_fill_manual(values=c("Female"="purple","Male"="green"))
+    
+  })
+  
+  
   
 }
 
