@@ -86,7 +86,7 @@ ui <- page_sidebar(
                   selectInput(
                     "cat1",
                     label = "Categorical Variable",
-                    choices=cat_vars
+                    choices=c(cat_vars,"All"=cat_vars2)
                     ,
                     selected="Gender"
                     
@@ -132,6 +132,7 @@ ui <- page_sidebar(
           "This is where all the information is going to go about the data and the website where it will be found"
         ),
         card(
+          card_header("Data Download"),
           dataTableOutput(outputId = "mobiledata")
         )
       )
@@ -139,9 +140,23 @@ ui <- page_sidebar(
 
 # Define server logic ----
 server <- function(input, output) {
+  
+  observeEvent(c(input$cat1, input$cat2), {
+    cat1 <- input$cat1
+    cat2<- input$cat2
+    choices <- numeric_vars
+    if (cat1 == cat2){
+      choices <- choices[-which(choices == cat1)]
+      updateSelectizeInput(session,
+                           "cat2",
+                           choices = choices)
+    }
+  }
+  )
+  
     output$mobiledata<-renderDataTable({
       if(input$show_data){
-        DT::datatable(data=data2 %>% select(1:9),
+        DT::datatable(data=data2 %>% select(input$cat1,input$cat2,input$num1,input$num2),
                       options=list(pageLenth=10),
                       rownames=FALSE)
       }
