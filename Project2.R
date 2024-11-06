@@ -90,7 +90,7 @@ ui <- fluidPage(
                   selectInput(
                     "cat2",
                     label = "Categorical Variable",
-                    choices=cat_vars
+                    choices=cat_vars[-1]
                     
                     
                   ),
@@ -134,17 +134,22 @@ ui <- fluidPage(
       card_header("Data Download"),
       dataTableOutput(outputId = "mobiledata")
     ),
+    
     card(
       card_header("Categorical Variables to Summarize"),
       selectInput(
         "cat11",
         label = "Categorical Variable",
         choices=cat_vars[-1])),
+    
+    uiOutput("subcat11"),
+    
       card(
         card_header("Bar Chart"),
         plotOutput(outputId = "barchart") , 
         plotOutput(outputId = "twobar")
     ),
+    
     card(
       card_header("Numerical Variable to Summarize"),
       plotOutput(outputId = "scatterplot"),
@@ -177,6 +182,7 @@ server <- function(input, output,session) {
                 multiple = FALSE)
   })
   
+  
   output$num1range <- renderUI({
     req(input$num1)  
     rangeval <- range(data2[[input$num1]], na.rm = TRUE)
@@ -200,8 +206,10 @@ server <- function(input, output,session) {
       select(input$cat1,input$cat2,input$num1,input$num2) %>%
       filter(
         !!sym(input$cat1) %in% input$cat1levels,   
-        !!sym(input$cat2) %in% input$cat2levels,   
+        !!sym(input$cat2) %in% input$cat2levels,  
 
+        
+        
       )
   })
   
@@ -216,17 +224,18 @@ server <- function(input, output,session) {
   
   )
   
-  filteredData2 <- reactive({
-    data2 %>%
-      select(Gender,input$cat11) %>%
-      drop_na(Gender,input$cat11)
-     
+  filtered2<-reactive({
+    data2%>%
+      group_by(Gender,get(input$cat11)) %>%
+      tally() %>%
+      ungroup()
   })
-
- 
+  
   
   output$barchart<-renderPlot({
-    ggplot(data=data2, aes(x=Gender, fill=Operating.System))+
+        sub<-filtered2()
+    
+    ggplot(data=sub, aes(x=Gender, fill=input$cat11))+
       geom_bar()+
       labs(x="Gender")+
       scale_fill_discrete()+
@@ -234,13 +243,16 @@ server <- function(input, output,session) {
   })
   
   output$scatterplot<-renderPlot({
+   
+    
     ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=User.Behavior.Class))+
       geom_point(shape=17,size=2)
   })
   
   output$twobar<-renderPlot({
+    sub<-filtered2()
   ggcharts_set_theme("theme_nightblue")
-  bar_chart(data=data2,x=Device.Model,facet=Gender)
+  bar_chart(data=sub,x=input$cat11,facet=Gender)
   })
   
   output$density<-renderPlot({
