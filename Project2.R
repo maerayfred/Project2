@@ -207,7 +207,12 @@ server <- function(input, output,session) {
       filter(
         !!sym(input$cat1) %in% input$cat1levels,   
         !!sym(input$cat2) %in% input$cat2levels,  
-
+        !!sym(input$num1) >= input$num1range[1],    
+        !!sym(input$num1) <= input$num1range[2],    
+        !!sym(input$num2) >= input$num2range[1],    
+        !!sym(input$num2) <= input$num2range[2]
+      
+    
         
         
       )
@@ -226,16 +231,13 @@ server <- function(input, output,session) {
   
   filtered2<-reactive({
     data2%>%
-      group_by(Gender,get(input$cat11)) %>%
-      tally() %>%
-      ungroup()
+     select(Gender,input$cat11)
   })
   
   
   output$barchart<-renderPlot({
-        sub<-filtered2()
-    
-    ggplot(data=sub, aes(x=Gender, fill=input$cat11))+
+   
+    ggplot(data=data2, aes(x=Gender, fill=Operating.System))+
       geom_bar()+
       labs(x="Gender")+
       scale_fill_discrete()+
@@ -250,9 +252,9 @@ server <- function(input, output,session) {
   })
   
   output$twobar<-renderPlot({
-    sub<-filtered2()
+ 
   ggcharts_set_theme("theme_nightblue")
-  bar_chart(data=sub,x=input$cat11,facet=Gender)
+  bar_chart(data=data2,x=Device.Model,facet=Gender)
   })
   
   output$density<-renderPlot({
