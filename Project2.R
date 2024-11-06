@@ -186,6 +186,15 @@ server <- function(input, output,session) {
                 value = rangeval)
   })
   
+  output$num2range <- renderUI({
+    req(input$num2)  
+    rangeval <- range(data2[[input$num2]], na.rm = TRUE)
+    sliderInput("num2range", 
+                label = paste("Select range for", input$numvar2),
+                min = rangeval[1], max = rangeval[2], 
+                value = rangeval)
+  })
+  
   filteredData <- reactive({
     data2 %>%
       select(input$cat1,input$cat2,input$num1,input$num2) %>%
