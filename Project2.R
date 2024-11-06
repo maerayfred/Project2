@@ -74,9 +74,12 @@ ggcharts_set_theme("theme_nightblue")
 bar_chart(data=data2,x=Device.Model,facet=Gender)
 
 
-ui <- page_sidebar(
-  title="Mobile Device Data Exploration",
-  sidebar=sidebar("Subset Data",
+ui <- fluidPage(
+  titlePanel("Mobile Device Data Exploration"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      h2("Subset Data"),
                   selectInput(
                     "cat1",
                     label = "Categorical Variable",
@@ -148,8 +151,10 @@ ui <- page_sidebar(
       plotOutput(outputId = "density")
     )
       )
-   
-    
+  
+ 
+  )
+  
   
 )
 
