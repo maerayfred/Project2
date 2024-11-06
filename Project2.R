@@ -136,19 +136,22 @@ ui <- fluidPage(
     ),
     
     card(
-      card_header("Categorical Variables to Summarize"),
-      selectInput(
-        "cat11",
-        label = "Categorical Variable",
-        choices=cat_vars[-1])),
-    
-    uiOutput("subcat11"),
+      card_header("Please Choose the Categorical Variables You would Like to Summarize on The Left Panel.")),
+     
+ 
     
       card(
         card_header("Bar Chart"),
         plotOutput(outputId = "barchart") , 
         plotOutput(outputId = "twobar")
     ),
+    
+    card(
+      card_header("Numeric Variables to Summarize"),
+      selectInput(
+        "num11",
+        label = "Numeric Variable",
+        choices=numeric_vars)),
     
     card(
       card_header("Numerical Variable to Summarize"),
@@ -230,14 +233,18 @@ server <- function(input, output,session) {
   )
   
   filtered2<-reactive({
+    second<-input$cat11
     data2%>%
-     select(Gender,input$cat11)
+     select(Gender,second)
+    
+  
+    
   })
   
   
   output$barchart<-renderPlot({
    
-    ggplot(data=data2, aes(x=Gender, fill=Operating.System))+
+    ggplot(data=data2, aes_string(x=cat_vars[1], fill=input$cat1))+
       geom_bar()+
       labs(x="Gender")+
       scale_fill_discrete()+
@@ -247,7 +254,7 @@ server <- function(input, output,session) {
   output$scatterplot<-renderPlot({
    
     
-    ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=User.Behavior.Class))+
+    ggplot(data=data2,aes_string(x=input$num1,y=input$num2,color=input$cat1))+
       geom_point(shape=17,size=2)
   })
   
@@ -258,7 +265,7 @@ server <- function(input, output,session) {
   })
   
   output$density<-renderPlot({
-    ggplot(data=data2|>drop_na(Age,Gender),aes(x=Age))+
+    ggplot(data=data2,aes(x=Age))+
       geom_density(alpha=0.05,color="black",aes(fill=Gender))+
       scale_fill_manual(values=c("Female"="purple","Male"="green"))
     
