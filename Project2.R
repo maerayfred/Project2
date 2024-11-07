@@ -4,7 +4,7 @@ source("helpers.R")
 
 ui <- fluidPage(
   titlePanel("Mobile Device Data Exploration"),
-  
+  #Adding an input to choose from categorical variables
   sidebarLayout(
     sidebarPanel(
       h2("Subset Data"),
@@ -22,9 +22,10 @@ ui <- fluidPage(
                     
                     
                   ),
+      #Adding in order to choose the levels from the categorical variables
                   uiOutput("cat1levels"),
                   uiOutput("cat2levels"),
-                  
+      #Adding in order to choose  from  Numeric  variables            
                   selectInput(
                     "num1",
                     label = "Numeric Variable",
@@ -41,13 +42,13 @@ ui <- fluidPage(
                     selected="Screen.On.Time..hours.day."
                     
                   ) ,
-                  
+      #Adding in order to choose the ranges from the numeric variables             
                   uiOutput("num1range"),
                   uiOutput("num2range"),
                   
-                  
+        #Adding button to allow the data to display once subset          
                   actionButton("show_data","Show Data Table",value=FALSE),
-                  
+       #Allowing the user to download the data in the server section           
       card(
         HTML("Select filetype and variables, then hit 'Download data'."),
         downloadButton("download_data", "Download data")
@@ -58,6 +59,7 @@ ui <- fluidPage(
                   
                   
   ),
+  
   mainPanel(
     card(
       h2("About Tab"),
@@ -71,17 +73,13 @@ ui <- fluidPage(
 In addition, the app provides opportunities to explore the data both visually and numerically. Simply toggle between the available categorical and numerical variables in the sidebar to adjust your analysis and gain insights from the data. Happy Exploring!"
     ),
 
-    
+   #Adding a card to display the data 
     card(
       card_header("Data Download"),
       dataTableOutput(outputId = "mobiledata")
     ),
     
-    card(
-      card_header("Please Choose the Categorical Variables You would Like to Summarize on The Left Panel.")),
-     
- 
-    
+    #Grouping All the Graphs together
       card(
         h2("Visual Summaries"),
         plotOutput(outputId = "barchart") , 
@@ -108,7 +106,7 @@ In addition, the app provides opportunities to explore the data both visually an
 
 # Define server logic ----
 server <- function(input, output,session) {
-  
+  #Allowing the user to subset the data for the different levels of categorical variable 1
   output$cat1levels <- renderUI({
     req(input$cat1)  
     selectInput("cat1levels", "Please Choose a Filter for First Categorical Variable", 
@@ -116,7 +114,7 @@ server <- function(input, output,session) {
                 selected = unique(data[[input$cat1]]), 
                 multiple = FALSE)
   })
-  
+  #Allowing the user to subset the data for the different levels of categorical variable 2
   output$cat2levels <- renderUI({
     req(input$cat2)  
     selectInput("cat2levels", "Please Choose a Filter for Second Categorical Variable", 
@@ -125,7 +123,7 @@ server <- function(input, output,session) {
                 multiple = FALSE)
   })
   
-  
+  #Allowing the user to subset the data for the range of numeric variable 1
   output$num1range <- renderUI({
     req(input$num1)  
     rangeval <- range(data2[[input$num1]], na.rm = TRUE)
@@ -134,7 +132,7 @@ server <- function(input, output,session) {
                 min = rangeval[1], max = rangeval[2], 
                 value = rangeval)
   })
-  
+  #Allowing the user to subset the data for the range of numeric variable 2
   output$num2range <- renderUI({
     req(input$num2)  
     rangeval <- range(data2[[input$num2]], na.rm = TRUE)
@@ -143,7 +141,7 @@ server <- function(input, output,session) {
                 min = rangeval[1], max = rangeval[2], 
                 value = rangeval)
   })
-  
+  #Filtering the data that will be displayed and downloaded based on subsets above
   filteredData <- reactive({
     data2 %>%
       select(input$cat1,input$cat2,input$num1,input$num2) %>%
@@ -160,7 +158,7 @@ server <- function(input, output,session) {
         
       )
   })
-  
+ #Rendering the subsetted data 
   output$mobiledata<-renderDataTable({
     if(input$show_data){
       DT::datatable(data=filteredData()
@@ -171,7 +169,7 @@ server <- function(input, output,session) {
   }
   
   )
-  
+  #Downloading the subsetted data
   output$download_data <- downloadHandler(
     filename = function() {
       paste0("mobiledata.csv")
@@ -185,15 +183,7 @@ server <- function(input, output,session) {
   )
 
   
-  filtered2<-reactive({
-    second<-input$cat11
-    data2%>%
-     select(Gender,second)
-    
-  
-    
-  })
-  
+  #Bar Chart
   
   output$barchart<-renderPlot({
    
@@ -205,6 +195,7 @@ server <- function(input, output,session) {
       coord_flip()
   })
   
+  #Scatterplot
   output$scatterplot<-renderPlot({
    
     
@@ -215,12 +206,14 @@ server <- function(input, output,session) {
       geom_point(shape=17,size=2)
   })
   
+  #
   output$twobar<-renderPlot({
  
   ggcharts_set_theme("theme_nightblue")
   bar_chart(data=data2,x=Gender,facet=Device.Model)
   })
   
+  #Density Plot
   output$density <- renderPlot({
 
     
@@ -232,7 +225,7 @@ server <- function(input, output,session) {
       theme_minimal()
   })
 
-  
+  #Box Plot
   output$box<-renderPlot({
     g <- ggplot(data2  )
     g + geom_boxplot(aes_string(x = input$cat1, y = input$num1, fill = input$cat1))+
@@ -242,6 +235,7 @@ server <- function(input, output,session) {
     
   })
   
+  #Typogrpahy Graphy
   output$mountain<-renderPlot({
     ggplot(data=data2, aes(x=Number.of.Apps.Installed, y=App.Usage.Time..min.day., fill=Gender)) + 
       geom_area() +
