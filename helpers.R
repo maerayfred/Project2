@@ -5,6 +5,9 @@ library(dplyr)
 library(shiny)
 library(bslib)
 library(DT)
+library(hrbrthemes)
+library(gcookbook)
+
 
 
 

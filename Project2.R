@@ -75,6 +75,19 @@ ggcharts_set_theme("theme_nightblue")
 bar_chart(data=data2,x=Device.Model,facet=Gender)
 
 
+#Plot6
+ggplot(data=data2, aes(x=Number.of.Apps.Installed, y=App.Usage.Time..min.day., fill=Gender)) + 
+  geom_area() +
+  scale_fill_ipsum() +
+  scale_x_continuous(expand=c(0,0)) +
+  scale_y_comma() +
+  labs(title="Title",
+       
+       ) +
+
+  theme(legend.position="bottom")
+
+
 ui <- fluidPage(
   titlePanel("Mobile Device Data Exploration"),
   
@@ -147,9 +160,13 @@ ui <- fluidPage(
  
     
       card(
-        card_header("Bar Chart"),
+        card_header("Visual Summaries"),
         plotOutput(outputId = "barchart") , 
-        plotOutput(outputId = "twobar")
+        plotOutput(outputId = "twobar"),
+        plotOutput(outputId = "scatterplot"),
+        plotOutput(outputId = "density"),
+        plotOutput(outputId = "box"),
+        plotOutput(outputId = "mountain"),
     ),
     
     card(
@@ -157,14 +174,9 @@ ui <- fluidPage(
       selectInput(
         "num11",
         label = "Numeric Variable",
-        choices=numeric_vars)),
+        choices=numeric_vars))
     
-    card(
-      card_header("Numerical Variable to Summarize"),
-      plotOutput(outputId = "scatterplot"),
-      plotOutput(outputId = "density"),
-      plotOutput(outputId = "box")
-    )
+ 
       )
   
  
@@ -281,19 +293,38 @@ server <- function(input, output,session) {
   output$twobar<-renderPlot({
  
   ggcharts_set_theme("theme_nightblue")
-  bar_chart(data=data2,x=Device.Model,facet=Gender)
+  bar_chart(data=data2,x=Gender,facet=Operating.System)
   })
   
-  output$density<-renderPlot({
-    ggplot(data=data2,aes(x=Age))+
-      geom_density(alpha=0.05,color="black",aes(fill=Gender))+
-      scale_fill_manual(values=c("Female"="purple","Male"="green"))
+  output$density <- renderPlot({
+
     
+    ggplot(data2, aes_string(x = input$num1, fill = input$cat1)) +
+      geom_density(alpha = 0.5) +
+      labs(x = input$num1, 
+           title = paste("Density Plot of", input$num1, "by", input$cat1),
+           fill = input$cat1) +
+      theme_minimal()
   })
+
   
   output$box<-renderPlot({
     g <- ggplot(data2  )
     g + geom_boxplot(aes_string(x = input$cat1, y = input$num1, fill = input$cat1))
+    
+  })
+  
+  output$mountain<-renderPlot({
+    ggplot(data=data2, aes(x=Number.of.Apps.Installed, y=App.Usage.Time..min.day., fill=Gender)) + 
+      geom_area() +
+      scale_fill_ipsum() +
+      scale_x_continuous(expand=c(0,0)) +
+      scale_y_comma() +
+      labs(title="Title",
+           
+      ) +
+      
+      theme(legend.position="bottom")
     
   })
   
