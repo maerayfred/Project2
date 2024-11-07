@@ -65,7 +65,8 @@ ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=U
 
 
 #Plot4
-
+g <- ggplot(data2 |> drop_na(Gender, Age) )
+g + geom_boxplot(aes(x = Gender, y = Age, fill = Gender))
 
 
 #Plot5
@@ -161,7 +162,8 @@ ui <- fluidPage(
     card(
       card_header("Numerical Variable to Summarize"),
       plotOutput(outputId = "scatterplot"),
-      plotOutput(outputId = "density")
+      plotOutput(outputId = "density"),
+      plotOutput(outputId = "box")
     )
       )
   
@@ -289,6 +291,11 @@ server <- function(input, output,session) {
     
   })
   
+  output$box<-renderPlot({
+    g <- ggplot(data2 |> drop_na(Gender, Age) )
+    g + geom_boxplot(aes(x = Gender, y = Age, fill = Gender))
+    
+  })
   
   
 }
