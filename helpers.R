@@ -32,7 +32,7 @@ cat_vars<-c("Gender"="Gender",
             "Operating System"="Operating.System",
             "Device Model"="Device.Model")
 
-cat_vars2<-cat_vars
+
 
 
 

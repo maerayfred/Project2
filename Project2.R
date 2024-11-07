@@ -252,14 +252,7 @@ server <- function(input, output,session) {
     
   })
   
-  output$one<-renderText({
-   one1<- data2|>
-      group_by(Gender)|>
-      summarize(mean_age=mean(Age,na.rm=TRUE),med_age=median(Age,na.rm=TRUE),min_age=min(Age,na.rm=TRUE),Max_age=max(Age,na.rm = TRUE))
-    
-    paste(one1)
-    
-  })
+ 
   
   
 }

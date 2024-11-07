@@ -5,9 +5,9 @@ account: u9x6ep-maegan-frederick
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 13260228
-bundleId: 9326922
+bundleId: 9327607
 url: https://u9x6ep-maegan-frederick.shinyapps.io/Project2/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .RData|helper.qmd|helpers.R|HW7Help.R|LICENSE|movies.RData|Project2.R|README.md|user_behavior_dataset.csv
+ignoredFiles: _quarto.yml|.nojekyll|.RData|Exploration.R|helpers.R|HW7Help.R|LICENSE|movies.RData|Project2.R|README.md|user_behavior_dataset.csv
