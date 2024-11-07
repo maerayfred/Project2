@@ -8,6 +8,9 @@ library(DT)
 library(hrbrthemes)
 library(gcookbook)
 
+library(rsconnect)
+
+
 data<-read.csv("user_behavior_dataset.csv")
 
 
