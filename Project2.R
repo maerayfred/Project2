@@ -1,6 +1,6 @@
 
 
-
+source("helpers.R")
 
 ui <- fluidPage(
   titlePanel("Mobile Device Data Exploration"),
@@ -273,4 +273,4 @@ server <- function(input, output,session) {
 # Run the app ----
 shinyApp(ui= ui, server= server)
 
-rsconnect::deployApp('Project2.R')
+
