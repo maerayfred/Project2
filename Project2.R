@@ -118,8 +118,13 @@ ui <- fluidPage(
                   uiOutput("num2range"),
                   
                   
-                  actionButton("show_data","Show Data Table",value=FALSE)
+                  actionButton("show_data","Show Data Table",value=FALSE),
                   
+      card(
+        HTML("Select filetype and variables, then hit 'Download data'."),
+        downloadButton("download_data", "Download data")
+      )
+              
                   
                   
                   
@@ -231,6 +236,19 @@ server <- function(input, output,session) {
   }
   
   )
+  
+  output$download_data <- downloadHandler(
+    filename = function() {
+      paste0("mobiledata.csv")
+    },
+    content = function(file) {
+    {
+        write_csv(filteredData(), file)
+      }
+      
+    }
+  )
+
   
   filtered2<-reactive({
     second<-input$cat11
