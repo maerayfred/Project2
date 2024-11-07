@@ -43,7 +43,8 @@ data2|>
 
 ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=Operating.System))+
   geom_bar()+
-  labs(x="Gender")+
+  labs(title="Relationship Between Gender and Operating Systems",
+    x="Gender")+
   scale_fill_discrete("Operating_System")+
   coord_flip()
 
@@ -52,17 +53,27 @@ ggplot(data=data2|>drop_na(Gender,Operating.System), aes(x=Gender, fill=Operatin
 
 ggplot(data=data2|>drop_na(Age,Gender),aes(x=Age))+
   geom_density(alpha=0.05,color="black",aes(fill=Gender))+
-  scale_fill_manual(values=c("Female"="purple","Male"="green"))
+
+  labs(title = "Density Plot of Age by Gender"
+    
+  )+
+    scale_fill_manual(values=c("Female"="purple","Male"="green"))
 
 #Plot3
 
 ggplot(data=data2,aes(x=Screen.On.Time..hours.day.,y=Data.Usage..MB.day.,color=User.Behavior.Class))+
+  labs(title = "Relationship Between Screen Time and Data Usage Grouped by Behavior"
+    
+  )+
   geom_point(shape=17,size=2)
 
 
 #Plot4
 g <- ggplot(data2 |> drop_na(Gender, Age) )
-g + geom_boxplot(aes(x = Gender, y = Age, fill = Gender))
+g + geom_boxplot(aes(x = Gender, y = Age, fill = Gender))+
+  labs(title = "Relationship Between Gender and Age"
+    
+  )
 
 
 #Plot5
@@ -77,8 +88,9 @@ ggplot(data=data2, aes(x=Number.of.Apps.Installed, y=App.Usage.Time..min.day., f
   scale_fill_ipsum() +
   scale_x_continuous(expand=c(0,0)) +
   scale_y_comma() +
-  labs(title="Title",
-       
+  labs(title="Relationship Between Number of Apps and App Usage by Gender",
+       x="Number of Apps Installed",
+       y="App Usage (min/day)"
        ) +
 
   theme(legend.position="bottom")
@@ -165,7 +177,7 @@ In addition, the app provides opportunities to explore the data both visually an
  
     
       card(
-        card_header("Visual Summaries"),
+        h2("Visual Summaries"),
         plotOutput(outputId = "barchart") , 
         plotOutput(outputId = "twobar"),
         plotOutput(outputId = "scatterplot"),
@@ -175,11 +187,9 @@ In addition, the app provides opportunities to explore the data both visually an
     ),
     
     card(
-      card_header("Numeric Variables to Summarize"),
-      selectInput(
-        "num11",
-        label = "Numeric Variable",
-        choices=numeric_vars))
+      h2("Numeric Summaries"),
+      textOutput(outputId = "one")
+      )
     
  
       )
@@ -281,9 +291,10 @@ server <- function(input, output,session) {
   
   output$barchart<-renderPlot({
    
-    ggplot(data=data2, aes_string(x=cat_vars[1], fill=input$cat1))+
+    ggplot(data=data2, aes_string(x=input$cat1, fill=input$cat2))+
       geom_bar()+
-      labs(x="Gender")+
+      labs( title = paste("Relationship Between",input$cat1,"and",input$cat),
+        x="Gender")+
       scale_fill_discrete()+
       coord_flip()
   })
@@ -292,6 +303,9 @@ server <- function(input, output,session) {
    
     
     ggplot(data=data2,aes_string(x=input$num1,y=input$num2,color=input$cat1))+
+      labs(title = paste("Relationship Between",input$num1,"and",input$num2,"Grouped by",input$cat1)
+        
+      )+
       geom_point(shape=17,size=2)
   })
   
@@ -315,7 +329,10 @@ server <- function(input, output,session) {
   
   output$box<-renderPlot({
     g <- ggplot(data2  )
-    g + geom_boxplot(aes_string(x = input$cat1, y = input$num1, fill = input$cat1))
+    g + geom_boxplot(aes_string(x = input$cat1, y = input$num1, fill = input$cat1))+
+      labs(title=paste("Relationship Between",input$cat1,"and",input$num1)
+        
+      )
     
   })
   
@@ -325,11 +342,22 @@ server <- function(input, output,session) {
       scale_fill_ipsum() +
       scale_x_continuous(expand=c(0,0)) +
       scale_y_comma() +
-      labs(title="Title",
+      labs(title="Relationship Between Number of Apps and App usage by Gender",
+           x="Number of Apps Installed",
+           y="App Usage (min/day)"
            
       ) +
       
       theme(legend.position="bottom")
+    
+  })
+  
+  output$one<-renderText({
+   one1<- data2|>
+      group_by(Gender)|>
+      summarize(mean_age=mean(Age,na.rm=TRUE),med_age=median(Age,na.rm=TRUE),min_age=min(Age,na.rm=TRUE),Max_age=max(Age,na.rm = TRUE))
+    
+    paste(one1)
     
   })
   
