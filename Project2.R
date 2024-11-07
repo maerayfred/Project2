@@ -1,12 +1,6 @@
 source("helpers.R")
-#Access shiny#Access the data locally 
 
-data<-read.csv("user_behavior_dataset.csv")
 
-str(data)
-
-data2<-data|>
-  mutate(User.Behavior.Class=as.factor(User.Behavior.Class))
 
 str(data2)
 
@@ -14,9 +8,11 @@ str(data2)
 
 
 #One way and Two way contingency Table 
-table(data2$Gender)
-table(data2$Operating.System)
+OneWayG<-table(data2$Gender)
+print(OneWayG)
 
+OneWayOS<-table(data2$Operating.System)
+print(OneWayOS)
 
 data2|>
   drop_na(Gender,Operating.System)|>
@@ -146,9 +142,18 @@ ui <- fluidPage(
   ),
   mainPanel(
     card(
-      card_header("About Tab"),
-      "This is where all the information is going to go about the data and the website where it will be found"
+      h2("About Tab"),
+      "Welcome to the Mobile Device Data Explorer app! This tool allows you to explore simulated mobile device data and analyze user behavior patterns. The dataset contains 700 complete observations across 11 variables, including age, gender, data usage, and operating system, among others. For more detailed information about the dataset and its variables, feel free to visit the following link:
+    
+
+  https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset/data
+      
+ On the left panel, you’ll find options to select both categorical and numerical variables from the dataset. You can choose to filter the data based on specific factors, levels, or numeric ranges. Once you’ve narrowed down the data to your preferred subset, you can easily download it as a CSV file for further analysis.
+
+In addition, the app provides opportunities to explore the data both visually and numerically. Simply toggle between the available categorical and numerical variables in the sidebar to adjust your analysis and gain insights from the data. Happy Exploring!"
     ),
+    img(src = "phone.jpeg", height = "300px", width = "300px"),
+    
     card(
       card_header("Data Download"),
       dataTableOutput(outputId = "mobiledata")
@@ -293,7 +298,7 @@ server <- function(input, output,session) {
   output$twobar<-renderPlot({
  
   ggcharts_set_theme("theme_nightblue")
-  bar_chart(data=data2,x=Gender,facet=Operating.System)
+  bar_chart(data=data2,x=Gender,facet=Device.Model)
   })
   
   output$density <- renderPlot({

@@ -8,7 +8,12 @@ library(DT)
 library(hrbrthemes)
 library(gcookbook)
 
+data<-read.csv("user_behavior_dataset.csv")
 
+
+
+data2<-data|>
+  mutate(User.Behavior.Class=as.factor(User.Behavior.Class))
 
 
 
