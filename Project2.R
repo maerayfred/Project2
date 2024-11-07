@@ -292,8 +292,8 @@ server <- function(input, output,session) {
   })
   
   output$box<-renderPlot({
-    g <- ggplot(data2 |> drop_na(Gender, Age) )
-    g + geom_boxplot(aes(x = Gender, y = Age, fill = Gender))
+    g <- ggplot(data2  )
+    g + geom_boxplot(aes_string(x = input$cat1, y = input$num1, fill = input$cat1))
     
   })
   
